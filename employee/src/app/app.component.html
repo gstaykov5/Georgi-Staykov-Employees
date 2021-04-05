@@ -1,0 +1,43 @@
+<input class="btn btn-primary" (change)="readFile($event)" type="file" id="file" multiple>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Employee</th>
+      <th scope="col">Project</th>
+      <th scope="col">DateFrom</th>
+      <th scope="col">DateTo</th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let emp of employee let i = index">
+    <tr>
+      <th scope="row">{{i}}</th>
+      <td>{{emp.empID}}</td>
+      <td>{{emp.projectID}}</td>
+      <td>{{emp.dateFrom}}</td>
+      <td>{{emp.dateTo}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<button type="button" class="btn btn-primary" (click)="findBestTwoEmpl()">Find best employyes</button>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Employee 1</th>
+      <th scope="col">Employee 2</th>
+      <th scope="col">Project ID</th>
+      <th scope="col">Days worked</th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let two of bestTwoEmp">
+    <tr>
+      <td>{{two.empl1.empID}}</td>
+      <td>{{two.empl2.empID}}</td>
+      <td>{{two.proj}}</td>
+      <td>{{two.daysWorked}}</td>
+    </tr>
+  </tbody>
+</table>
