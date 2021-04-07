@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { DebugElement, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -6,8 +6,10 @@ import { Observable } from 'rxjs';
 })
 export class WorkDaysService {
   days: any;
-  projectDays: any = {};
   employee: any = [];
+  projectDays: any = {};
+  daysTogether: any = [];
+  bestTwoEmpl: any = [];
   date = new Date().toISOString().slice(0, 10);
 
   constructor() { }
@@ -22,6 +24,7 @@ export class WorkDaysService {
   }
 
   getFile(days: any) {
+    this.employee = [];
     days.split('\n').forEach(element => {
       let [empID, projectID, dateFrom, dateTo] = element.split(', ');
       !this.projectDays[projectID] ? this.projectDays[projectID] = 0 : null;
@@ -40,8 +43,9 @@ export class WorkDaysService {
     return this.employee;
   }
 
-  getBestEmpl(employee: any) {
-    let daysToguether = {
+  sortByProject(employee: any) {
+    this.daysTogether = [];
+    let current = {
       daysWorked: null,
       empl1: null,
       empl2: null,
@@ -63,19 +67,49 @@ export class WorkDaysService {
 
             let workingDays = this.workDays(dateFrom, dateTo);
 
-            daysToguether = daysToguether.daysWorked < workingDays ?
-              {
-                daysWorked: workingDays,
-                empl1: empl,
-                empl2: employee[j],
-                proj: empl.projectID
-              }
-              : daysToguether
+            current = {
+              daysWorked: workingDays,
+              empl1: empl,
+              empl2: employee[j],
+              proj: empl.projectID
+            };
           }
+          this.daysTogether.push(current);
         }
       }
     }
-    return [daysToguether];
+    return this.daysTogether;
   }
-  
+
+  getBestTwoEmpl(allEmpl) {
+    this.bestTwoEmpl = [];
+
+    for (let i = 0; i < allEmpl.length; i++) {
+      const empl1 = allEmpl[i].empl1.empID;
+      const empl2 = allEmpl[i].empl2.empID;
+      let current = {
+        empl: { empl1, empl2 },
+        daysWorked: allEmpl[i].daysWorked,
+        proj: [allEmpl[i].proj]
+      };
+
+      for (var j = allEmpl.length - 1; j >= i + 1; j--) {
+        const empl3 = allEmpl[j].empl1.empID;
+        const empl4 = allEmpl[j].empl2.empID;
+        if ((empl1 === empl3 || empl1 === empl4) &&
+          (empl2 === empl3 || empl2 === empl4)) {
+          current.daysWorked += allEmpl[j].daysWorked;
+          current.proj.push(allEmpl[j].proj);
+          allEmpl.splice(j, 1);
+        }
+      }
+      this.bestTwoEmpl.push(current);
+    }
+
+    this.bestTwoEmpl.sort((a, b) => {
+      return b.daysWorked - a.daysWorked;
+    })
+    return [this.bestTwoEmpl[0]];
+  }
+
 }

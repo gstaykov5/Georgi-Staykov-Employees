@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, ViewChildren } from '@angular/core';
 import { WorkDaysService } from './core/service/work-days.service';
 
 @Component({
@@ -8,23 +8,25 @@ import { WorkDaysService } from './core/service/work-days.service';
 })
 export class AppComponent {
   title = 'employee';
+  @ViewChild('empl') asd: any;
   fileText: any;
   employee: any = [];
-  bestTwoEmp: any = [];
+  bestTwoEmpl: any = [];
+  getAllEmpl: any = [];
 
   constructor(private workDaysService: WorkDaysService) { }
 
   readFile(ev: any): void {
     this.loadFile(ev.target);
   }
-
+  
   loadFile(input: any) {
+    this.bestTwoEmpl = [];
     const file: File = input.files[0];
     const fileReader: FileReader = new FileReader();
-    // const fileReader: XMLDocument = new XMLDocument();
-
+    
     fileReader.onloadend = () => {
-      this.fileText = fileReader.result;
+      this.fileText = fileReader.result.toString().trim();
       this.employee = this.workDaysService.getFile(this.fileText);
     }
 
@@ -32,6 +34,8 @@ export class AppComponent {
   }
 
   findBestTwoEmpl() {
-    this.bestTwoEmp = this.workDaysService.getBestEmpl(this.employee);
+    this.getAllEmpl = this.workDaysService.sortByProject(this.employee);
+    this.bestTwoEmpl = this.workDaysService.getBestTwoEmpl(this.getAllEmpl);
+    console.log(this.bestTwoEmpl)
   }
 }
